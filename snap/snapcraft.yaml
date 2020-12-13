@@ -1,0 +1,16 @@
+name: browser-demux
+base: core18
+version: '0.1+git'
+summary: Launch a different browser depending on the URL
+description: |
+  A utility to launch different browsers depending on the URL.
+  For example, use Chrome for the work-related links and Firefox for everything else.
+
+grade: devel # must be 'stable' to release into candidate/stable channels
+confinement: devmode # use 'strict' once you have the right plugs and slots
+
+parts:
+  browser-demux:
+    plugin: go
+    source: ./browser-demux
+
