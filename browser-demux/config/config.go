@@ -6,6 +6,7 @@ import (
 	. "github.com/andeyfedoseev/browser-demux/browser"
 	. "github.com/andeyfedoseev/browser-demux/pattern"
 	"gopkg.in/ini.v1"
+	"sort"
 )
 
 const configFilename = "browser-demux.ini"
@@ -17,13 +18,13 @@ type Config struct {
 	Patterns []*Pattern
 }
 
-func Load() (*Config, error) {
+var GetDefaultConfigPath = func() (string, error) {
+	return xdg.ConfigFile(configFilename)
+}
+
+func Load(configPath string) (*Config, error) {
 	iniCfg := ini.Empty()
-	oath, err := xdg.ConfigFile(configFilename)
-	if err != nil {
-		return nil, err
-	}
-	if err := iniCfg.Append(oath); err != nil {
+	if err := iniCfg.Append(configPath); err != nil {
 		return nil, err
 	}
 	browsersSection, err := iniCfg.GetSection(browsersSectionName)
@@ -56,6 +57,11 @@ func Load() (*Config, error) {
 		}
 		c.Patterns = append(c.Patterns, p)
 	}
+
+	sort.Slice(c.Patterns[:], func(i, j int) bool {
+		return len(c.Patterns[i].Pattern) > len(c.Patterns[j].Pattern)
+	})
+
 	return c, nil
 }
 
