@@ -3,7 +3,7 @@
 Version=1.0
 Name=Browser Demux
 Keywords=Internet;WWW;Browser;Web
-Exec=/home/andrey/bin/browser-demux %u
+Exec=browser-demux %u
 Terminal=false
 X-MultipleArgs=false
 Type=Application
