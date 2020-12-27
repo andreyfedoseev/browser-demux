@@ -3,6 +3,7 @@ package main
 import (
 	. "github.com/andeyfedoseev/browser-demux/browser"
 	"github.com/andeyfedoseev/browser-demux/config"
+	"github.com/andeyfedoseev/browser-demux/registration"
 	"github.com/jessevdk/go-flags"
 	"log"
 	"os"
@@ -48,8 +49,7 @@ func createBlankConfig() error {
 }
 
 func register() error {
-	// TODO: implement
-	return nil
+	return registration.Register()
 }
 
 func loadConfig() (*config.Config, error) {
