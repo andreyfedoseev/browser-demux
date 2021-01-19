@@ -4,16 +4,11 @@ package registration
 
 import (
 	"errors"
-	"github.com/adrg/xdg"
 	"github.com/andeyfedoseev/browser-demux/utils"
-	"gopkg.in/ini.v1"
+	"os/exec"
 	"path"
 	"strings"
 )
-
-const defaultApplications = "Default Applications"
-const schemeHTTP = "x-scheme-handler/http"
-const schemeHTTPS = "x-scheme-handler/https"
 
 func Register() error {
 	for _, filePath := range utils.ListDesktopFiles() {
@@ -26,33 +21,21 @@ func Register() error {
 }
 
 func setDefaultBrowser(desktopFile string) error {
-	iniCfg := ini.Empty(ini.LoadOptions{
-		IgnoreInlineComment: true,
-	})
-	cfgPath := path.Join(xdg.ConfigHome, "mimeapps.list")
-	if err := iniCfg.Append(cfgPath); err != nil {
-		return err
+	if _, err := exec.LookPath("xdg-settings"); err != nil {
+		return errors.New("xdg-settings command not found. make sure that you have xdg-utils package installed")
 	}
-	section := iniCfg.Section(defaultApplications)
-	if section == nil {
-		if newSection, err := iniCfg.NewSection(defaultApplications); err != nil {
-			return err
-		} else {
-			section = newSection
-		}
-	}
-	for _, scheme := range [2]string{
-		schemeHTTP, schemeHTTPS,
+	for _, args := range [][]string{
+		{"set", "default-web-browser", desktopFile},
+		{"set", "default-url-scheme-handler", "http", desktopFile},
+		{"set", "default-url-scheme-handler", "https", desktopFile},
 	} {
-		key := section.Key(scheme)
-		if key == nil {
-			if _, err := section.NewKey(scheme, desktopFile); err != nil {
-				return err
-			}
-		} else {
-			key.SetValue(desktopFile)
+		cmd := exec.Command("xdg-settings", args...)
+		if err := cmd.Start(); err != nil {
+			return err
+		}
+		if _, err := cmd.Process.Wait(); err != nil {
+			return err
 		}
 	}
-	ini.PrettyFormat = false
-	return iniCfg.SaveTo(cfgPath)
+	return nil
 }
