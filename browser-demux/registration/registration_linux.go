@@ -4,16 +4,18 @@ package registration
 
 import (
 	"errors"
-	"github.com/andeyfedoseev/browser-demux/utils"
 	"os/exec"
 	"path"
 	"strings"
+
+	"github.com/andeyfedoseev/browser-demux/utils"
 )
 
 func Register() error {
 	for _, filePath := range utils.ListDesktopFiles() {
 		_, filename := path.Split(filePath)
-		if strings.HasSuffix(filename, "browser-demux.desktop") {
+		filenameLower := strings.ToLower(filename)
+		if strings.HasSuffix(filenameLower, "browser-demux.desktop") || strings.HasSuffix(filenameLower, "browser_demux.desktop") {
 			return setDefaultBrowser(filename)
 		}
 	}
