@@ -1,9 +1,20 @@
-APP_IMAGE_DIR = ./build/AppImage
-ARCH = x64
+BUILD_DIR = ./build
+DIST_DIR = ./dist
+APP_IMAGE_DIR = $(BUILD_DIR)/AppImage
+OS = linux
+ARCH = amd64
+
+.PHONY: setup
+setup:
+	cd ./browser-demux && go get
 
 .PHONY: build
-build:
-	cd ./browser-demux && go build -o ../build/browser-demux
+build: setup
+	cd ./browser-demux && env GOOS=$(OS) GOARCH=$(ARCH) go build -o ../build/browser-demux .
+
+.PHONY: test
+test: setup
+	cd ./browser-demux && go test -v ./...
 
 .PHONY: all
 all: build
@@ -17,4 +28,10 @@ appimage: build
 	cp ./packaging/browser-demux.desktop $(APP_IMAGE_DIR)
 	ln -s -r $(APP_IMAGE_DIR)/icon.png $(APP_IMAGE_DIR)/.DirIcon
 	ln -s -r $(APP_IMAGE_DIR)/browser-demux $(APP_IMAGE_DIR)/AppRun
-	appimagetool-x86_64.AppImage $(APP_IMAGE_DIR) ./build/BrowserDemux-$(ARCH).AppImage
+	mkdir -p $(DIST_DIR)
+	appimagetool-x86_64.AppImage $(APP_IMAGE_DIR) $(DIST_DIR)/BrowserDemux-$(ARCH).AppImage
+
+.PHONY: clean
+clean:
+	rm -rf BUILD_DIR
+	rm -rf DIST_DIR
