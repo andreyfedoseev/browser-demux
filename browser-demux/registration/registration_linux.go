@@ -4,6 +4,7 @@ package registration
 
 import (
 	"errors"
+	"fmt"
 	"os/exec"
 	"path"
 	"strings"
@@ -17,6 +18,15 @@ func Register() error {
 		filenameLower := strings.ToLower(filename)
 		if strings.HasSuffix(filenameLower, "browser-demux.desktop") || strings.HasSuffix(filenameLower, "browser_demux.desktop") {
 			return setDefaultBrowser(filename)
+		}
+	}
+	if create, err := utils.ConfirmAction("Could not find a desktop file for browser-demux. Do you want to create one? Type 'y' to confirm: "); err != nil {
+		return err
+	} else if create {
+		if desktopFile, err := utils.CreateDesktopFile(); err != nil {
+			return err
+		} else {
+			return setDefaultBrowser(desktopFile)
 		}
 	}
 	return errors.New("could not find the .desktop file")
@@ -39,5 +49,6 @@ func setDefaultBrowser(desktopFile string) error {
 			return err
 		}
 	}
+	fmt.Printf("%s is set as the default browser\n", desktopFile)
 	return nil
 }
