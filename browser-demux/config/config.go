@@ -2,11 +2,13 @@ package config
 
 import (
 	"errors"
+	"fmt"
+	"sort"
+
 	"github.com/adrg/xdg"
 	. "github.com/andeyfedoseev/browser-demux/browser"
 	. "github.com/andeyfedoseev/browser-demux/pattern"
 	"gopkg.in/ini.v1"
-	"sort"
 )
 
 const configFilename = "browser-demux.ini"
@@ -89,7 +91,11 @@ func (c *Config) Save() error {
 	if err != nil {
 		return err
 	}
-	return cfg.SaveTo(path)
+	if err := cfg.SaveTo(path); err != nil {
+		return err
+	}
+	fmt.Printf("Configuration file saved to %s\n", path)
+	return nil
 }
 
 func CreateBlank() error {
