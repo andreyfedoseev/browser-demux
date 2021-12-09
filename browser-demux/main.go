@@ -1,12 +1,13 @@
 package main
 
 import (
-	. "github.com/andeyfedoseev/browser-demux/browser"
+	"log"
+	"os"
+
+	"github.com/andeyfedoseev/browser-demux/browser"
 	"github.com/andeyfedoseev/browser-demux/config"
 	"github.com/andeyfedoseev/browser-demux/registration"
 	"github.com/jessevdk/go-flags"
-	"log"
-	"os"
 )
 
 var opts struct {
@@ -35,7 +36,7 @@ func main() {
 		}
 		if len(args) > 0 {
 			url := args[0]
-			if err := openURL(new(ExecLauncher), cfg, url); err != nil {
+			if err := openURL(new(browser.ExecLauncher), cfg, url); err != nil {
 				log.Fatal(err)
 			}
 		} else {
@@ -64,7 +65,7 @@ func loadConfig() (*config.Config, error) {
 	return cfg, nil
 }
 
-func openURL(launcher Launcher, cfg *config.Config, url string) error {
+func openURL(launcher browser.Launcher, cfg *config.Config, url string) error {
 	b, err := getBrowserForURL(cfg, url)
 	if err != nil {
 		return err
@@ -75,7 +76,7 @@ func openURL(launcher Launcher, cfg *config.Config, url string) error {
 	return nil
 }
 
-func getBrowserForURL(cfg *config.Config, url string) (*Browser, error) {
+func getBrowserForURL(cfg *config.Config, url string) (*browser.Browser, error) {
 	for _, p := range cfg.Patterns {
 		if p.Matches(url) {
 			return p.Browser, nil

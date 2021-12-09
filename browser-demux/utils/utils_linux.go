@@ -13,8 +13,7 @@ import (
 
 func ListDesktopFiles() []string {
 	var paths []string
-	for _, dataDir := range append([]string{xdg.DataHome}, xdg.DataDirs...) {
-		appsDir := path.Join(dataDir, "applications")
+	for _, appsDir := range xdg.ApplicationDirs {
 		files, err := ioutil.ReadDir(appsDir)
 		if err != nil {
 			continue
@@ -38,7 +37,7 @@ Exec=browser-demux %u
 Terminal=false
 X-MultipleArgs=false
 Type=Application
-Categories=Network;
+Categories=Network;WebBrowser;
 MimeType=text/html;text/xml;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/ftp;
 StartupNotify=false
 Icon=browser-demux
