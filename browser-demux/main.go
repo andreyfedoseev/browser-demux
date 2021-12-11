@@ -1,12 +1,15 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"log"
 	"os"
 
 	"github.com/andeyfedoseev/browser-demux/browser"
 	"github.com/andeyfedoseev/browser-demux/config"
 	"github.com/andeyfedoseev/browser-demux/registration"
+	"github.com/andeyfedoseev/browser-demux/utils"
 	"github.com/jessevdk/go-flags"
 )
 
@@ -46,7 +49,32 @@ func main() {
 }
 
 func createBlankConfig() error {
-	return config.CreateBlank()
+	var configPath string
+	var configExists bool
+	var err error
+	if configPath, err = config.GetDefaultConfigPath(); err != nil {
+		return err
+	}
+	if _, err = os.Stat(configPath); err == nil {
+		configExists = true
+	} else if errors.Is(err, os.ErrNotExist) {
+		configExists = false
+	} else {
+		return err
+	}
+	if configExists {
+		msg := fmt.Sprintf("%s exists already. Do you want to overwrite it with blank config? Type `y` to confirm: ", configPath)
+		if overwrite, err := utils.ConfirmAction(msg); err != nil {
+			return err
+		} else if overwrite {
+			return config.CreateBlank()
+		} else {
+			return nil
+		}
+	} else {
+		return config.CreateBlank()
+	}
+
 }
 
 func register() error {

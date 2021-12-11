@@ -87,7 +87,7 @@ func (c *Config) Save() error {
 			return err
 		}
 	}
-	path, err := xdg.ConfigFile(configFilename)
+	path, err := GetDefaultConfigPath()
 	if err != nil {
 		return err
 	}
